@@ -10,8 +10,10 @@ import com.redeemerlives.jobms.job.external.Company;
 import com.redeemerlives.jobms.job.external.Review;
 import com.redeemerlives.jobms.job.mapper.JobMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +23,8 @@ public class JobServiceImpl implements JobService {
     private final CompanyClient companyClient;
     private final ReviewClient reviewClient;
 
+    private int numberOfAttempts = 0;
+
     public JobServiceImpl(JobRepository jobRepository, CompanyClient companyClient, ReviewClient reviewClient) {
         this.jobRepository = jobRepository;
         this.companyClient = companyClient;
@@ -28,11 +32,19 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    @CircuitBreaker(name = "companyBreaker")
+    @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+//    @Retry(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> getAllJobs() {
+        System.out.println("Attempts " + ++numberOfAttempts);
         List<Job> jobs = jobRepository.findAll();
 
         return jobs.stream().map(this::convertJobAndCompanyToDTO).toList();
+    }
+
+    private List<String> companyBreakerFallback(Exception e) {
+        List<String> fallBackList = new ArrayList<>();
+        fallBackList.add("something went wrong, try again later");
+        return fallBackList;
     }
 
     private JobDTO convertJobAndCompanyToDTO(Job job) {
