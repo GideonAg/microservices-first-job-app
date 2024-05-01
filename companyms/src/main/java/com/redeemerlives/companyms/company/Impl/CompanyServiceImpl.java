@@ -3,6 +3,7 @@ package com.redeemerlives.companyms.company.Impl;
 import com.redeemerlives.companyms.company.Company;
 import com.redeemerlives.companyms.company.CompanyRepository;
 import com.redeemerlives.companyms.company.CompanyService;
+import com.redeemerlives.companyms.company.dto.ReviewMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,6 +45,11 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         return false;
+    }
+
+    @Override
+    public void updatedCompanyRating(ReviewMessage reviewMessage) {
+        System.out.println(reviewMessage.getDescription());
     }
 
     @Override

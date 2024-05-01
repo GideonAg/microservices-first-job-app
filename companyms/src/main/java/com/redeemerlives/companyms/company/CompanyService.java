@@ -1,5 +1,7 @@
 package com.redeemerlives.companyms.company;
 
+import com.redeemerlives.companyms.company.dto.ReviewMessage;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +15,6 @@ public interface CompanyService {
     boolean deleteCompany(int id);
 
     Optional<Company> getCompanyById(int id);
+
+    void updatedCompanyRating(ReviewMessage reviewMessage);
 }

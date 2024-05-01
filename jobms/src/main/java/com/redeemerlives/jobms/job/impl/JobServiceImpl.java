@@ -24,8 +24,6 @@ public class JobServiceImpl implements JobService {
     private final CompanyClient companyClient;
     private final ReviewClient reviewClient;
 
-    private int numberOfAttempts = 0;
-
     public JobServiceImpl(JobRepository jobRepository, CompanyClient companyClient, ReviewClient reviewClient) {
         this.jobRepository = jobRepository;
         this.companyClient = companyClient;
@@ -37,7 +35,6 @@ public class JobServiceImpl implements JobService {
 //    @Retry(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     @RateLimiter(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> getAllJobs() {
-        System.out.println("Attempts " + ++numberOfAttempts);
         List<Job> jobs = jobRepository.findAll();
 
         return jobs.stream().map(this::convertJobAndCompanyToDTO).toList();

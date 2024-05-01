@@ -1,5 +1,6 @@
 package com.redeemerlives.reviewms.review;
 
+import com.redeemerlives.reviewms.review.messaging.ReviewMessageProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewsService reviewsService;
+    private final ReviewMessageProducer reviewMessageProducer;
 
-    public ReviewController(ReviewsService reviewsService) {
+    public ReviewController(ReviewsService reviewsService, ReviewMessageProducer reviewMessageProducer) {
         this.reviewsService = reviewsService;
+        this.reviewMessageProducer = reviewMessageProducer;
     }
 
     @GetMapping
@@ -24,8 +27,10 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<String> createReview(@RequestParam int companyId, @RequestBody Reviews reviewBody) {
         Boolean review = reviewsService.createReview(companyId, reviewBody);
-        if (review)
+        if (review) {
+            reviewMessageProducer.sendMessage(reviewBody);
             return ResponseEntity.status(HttpStatus.CREATED).body("review created successfully");
+        }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
