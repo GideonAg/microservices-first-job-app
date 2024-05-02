@@ -3,6 +3,7 @@ package com.redeemerlives.companyms.company.Impl;
 import com.redeemerlives.companyms.company.Company;
 import com.redeemerlives.companyms.company.CompanyRepository;
 import com.redeemerlives.companyms.company.CompanyService;
+import com.redeemerlives.companyms.company.clients.ReviewClient;
 import com.redeemerlives.companyms.company.dto.ReviewMessage;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
+    private final ReviewClient reviewClient;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, ReviewClient reviewClient) {
         this.companyRepository = companyRepository;
+        this.reviewClient = reviewClient;
     }
 
     @Override
@@ -49,7 +52,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void updatedCompanyRating(ReviewMessage reviewMessage) {
-        System.out.println(reviewMessage.getDescription());
+        Double averageRating = reviewClient.getAverageRating(reviewMessage.getCompanyId());
+        Optional<Company> company = companyRepository.findById(reviewMessage.getCompanyId());
+        company.ifPresent(company1 -> {
+            company1.setRating(averageRating);
+            companyRepository.save(company1);
+        });
     }
 
     @Override
