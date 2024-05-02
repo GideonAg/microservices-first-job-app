@@ -12,6 +12,7 @@ public class Company {
     private int id;
     private String name;
     private String description;
+    private double rating;
 
     public Company() {
 
@@ -20,6 +21,14 @@ public class Company {
     public Company(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public int getId() {
