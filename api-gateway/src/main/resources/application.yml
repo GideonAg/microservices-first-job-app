@@ -1,0 +1,41 @@
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: trace
+          gateway.route.RouteDefinitionLocator: info
+    root: info
+management:
+  tracing: { sampling: { probability: 1.0 } }
+server:
+  port: 8085
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        -   id: eureka_server
+            predicates:
+              - Path=/eureka/**
+            uri: http://localhost:8761
+            filters: SetPath=/
+        -   id: company_service
+            predicates:
+              - Path=/companies/**
+            uri: lb://companyms
+        -   id: job_service
+            predicates:
+              - Path=/jobs/**
+            uri: lb://jobms
+        -   id: reviews_service
+            predicates:
+              - Path=/reviews/**
+            uri: lb://reviewms
